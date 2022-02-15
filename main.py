@@ -9,6 +9,8 @@ OPERATIONS = {
 
 
 def reduce(function, iterable, initial_value):
+    """reducer recursivo que aplica a função em cada 
+    elemento do iterável e usa o resultado como entrada da próxima iteração"""
     if len(iterable) == 0:
         return initial_value
     current_value = function(initial_value, iterable[0])
@@ -31,10 +33,12 @@ def tokenize(expression: str):
 
 
 def trim(tokens: List[str]):
+    """Remove espaço em branco antes e depois de cada token"""
     return [token.strip() for token in tokens]
 
 
 def calculate(tokens: List[str]):
+    """Itera sobre a lista de tokens e faz operações entre os números"""
     accumulator = 0
     last_op = '+'
     for token in tokens:
@@ -49,12 +53,8 @@ def calculate(tokens: List[str]):
     return accumulator
 
 
-def pipeline(value, function):
-    return function(value)
-
-
 def main(case):
-    rst = reduce(pipeline, [tokenize, trim, calculate], case)
+    rst = reduce(lambda value, f: f(value), [tokenize, trim, calculate], case)
     print(rst)
 
 
