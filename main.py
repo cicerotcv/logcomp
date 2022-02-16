@@ -53,14 +53,18 @@ def calculate(tokens: List[str]):
 
 
 def safe_guard(case: str):
-    if case.startswith('+'):
-        raise Exception("Expression starts with '+'")
-    elif case.endswith('+') or case.endswith('-'):
-        raise Exception("Expression ends with '-' or '+'")
-
     for char in case:
         if not char.isnumeric() and char not in OPERATORS.keys():
             raise Exception(f"Unrecognized char '{char}'")
+
+    if all([operator not in case for operator in OPERATORS.keys()]):
+        raise Exception("No operator found in the expression")
+
+    if case.startswith('+'):
+        raise Exception("Expression starts with '+'")
+
+    if case.endswith('+') or case.endswith('-'):
+        raise Exception("Expression ends with '-' or '+'")
 
     return case
 
