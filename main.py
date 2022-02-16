@@ -2,7 +2,7 @@
 from sys import argv
 from typing import List
 
-OPERATIONS = {
+OPERATORS = {
     '+': lambda before, after: before + after,
     '-': lambda before, after: before - after
 }
@@ -17,13 +17,17 @@ def reduce(function, iterable, initial_value):
     return reduce(function, iterable[1:], current_value)
 
 
+def clean(expression: str):
+    return expression.replace(' ', '')
+
+
 def tokenize(expression: str):
     """Quebra expressões em operadores e números"""
     tokens = []
     start = 0
     length = len(expression)
     for end in range(length):
-        if expression[end] in OPERATIONS.keys():
+        if expression[end] in OPERATORS.keys():
             tokens.append(expression[start:end])
             tokens.append(expression[end])
             start = end + 1
@@ -32,29 +36,38 @@ def tokenize(expression: str):
     return tokens
 
 
-def trim(tokens: List[str]):
-    """Remove espaço em branco antes e depois de cada token"""
-    return [token.strip() for token in tokens]
-
-
 def calculate(tokens: List[str]):
     """Itera sobre a lista de tokens e faz operações entre os números"""
     accumulator = 0
     last_op = '+'
     for token in tokens:
-        if token.isalnum():
+        if token.isnumeric():
             token = int(token)
-            function = OPERATIONS[last_op]
+            function = OPERATORS[last_op]
             accumulator = function(accumulator, int(token))
-        elif token in OPERATIONS.keys():
+        elif token in OPERATORS.keys():
             last_op = token
         else:
             continue
     return accumulator
 
 
+def safe_guard(case: str):
+    if case.startswith('+'):
+        raise Exception("Expression starts with '+'")
+    elif case.endswith('+') or case.endswith('-'):
+        raise Exception("Expression ends with '-' or '+'")
+
+    for char in case:
+        if not char.isnumeric() and char not in OPERATORS.keys():
+            raise Exception(f"Unrecognized char '{char}'")
+
+    return case
+
+
 def main(case):
-    rst = reduce(lambda value, f: f(value), [tokenize, trim, calculate], case)
+    pipeline = [clean, safe_guard, tokenize, calculate]
+    rst = reduce(lambda value, f: f(value), pipeline, case)
     print(rst)
 
 
