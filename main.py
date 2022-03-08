@@ -8,23 +8,23 @@ T_MINUS = 'minus'
 T_EOE = 'end_of_expression'
 
 # errors
-E_INITIAL_CHAR = 'initial_char'
-E_INVALID_TOKEN = 'invalid_token'
+E_TOKEN_ERROR = 'invalid_token'
+E_SYNTAX_ERROR = 'syntax_error'
 
 
 class Error(Exception):
-    def __init__(self, code, message):
-        super().__init__({'code': code, 'message': message})
+    def __init__(self, type, description):
+        super().__init__({'type': type, 'description': description})
 
 
 class InvalidToken(Error):
-    def __init__(self, message) -> None:
-        super().__init__("invalid-token", message)
+    def __init__(self, description) -> None:
+        super().__init__(E_TOKEN_ERROR, description)
 
 
 class InvalidExpression(Error):
-    def __init__(self, message) -> None:
-        super().__init__("invalid-expression", message)
+    def __init__(self, description) -> None:
+        super().__init__(E_SYNTAX_ERROR, description)
 
 
 class Token:
@@ -88,7 +88,7 @@ class Tokenizer:
             return self.current
 
         tokenValue = self.origin[self.position]
-        raise Exception(f"Unrecognized token '{tokenValue}'")
+        raise InvalidToken(f"Unrecognized token '{tokenValue}'")
 
 
 class Parser:
