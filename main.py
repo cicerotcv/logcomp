@@ -183,7 +183,7 @@ def main(case):
 
 
 if __name__ == '__main__':
-    case = argv[1]
+    case = argv[1] # teste
     print(main(case))
     # cases = [
     #     # casos sem erro
