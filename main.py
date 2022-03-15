@@ -5,6 +5,8 @@ from sys import argv
 T_INT = 'int'
 T_PLUS = 'plus'
 T_MINUS = 'minus'
+T_MULTI = 'multi'
+T_DIV = 'div'
 T_EOE = 'end_of_expression'
 
 # errors
@@ -14,7 +16,7 @@ E_SYNTAX_ERROR = 'syntax_error'
 
 class Error(Exception):
     def __init__(self, type, description):
-        super().__init__({'type': type, 'description': description})
+        super().__init__(f'{type} :: {description}')
 
 
 class InvalidToken(Error):
@@ -22,7 +24,7 @@ class InvalidToken(Error):
         super().__init__(E_TOKEN_ERROR, description)
 
 
-class InvalidExpression(Error):
+class SyntaxError(Error):
     def __init__(self, description) -> None:
         super().__init__(E_SYNTAX_ERROR, description)
 
@@ -37,12 +39,24 @@ class Token:
             return f'<{self.type}:{self.value}>'
         return f'<{self.type}>'
 
-    def isNumber(self):
-        return self.type == T_INT
 
-    def __add__(self, another):
-        if self.value != None:
-            return Token(T_INT, 10*int(self.value) + int(another.value))
+class PrePro:
+    @staticmethod
+    def filter(expression):
+        start = expression.find('/*')
+
+        if start == -1:
+            return expression
+
+        end = expression.find('*/')
+
+        if end == -1:
+            return SyntaxError("Comment block doesn't close")
+
+        replace_string = expression[start:end + 2]
+        expression = expression.replace(replace_string, '', 1)
+
+        return PrePro.filter(expression)
 
 
 class Tokenizer:
@@ -51,7 +65,7 @@ class Tokenizer:
         self.position: int = 0
         self.current: Token = None
 
-    def selectNext(self):
+    def select_next(self):
 
         # self.current já consumiu o último caractere e self.origin
         if self.position >= len(self.origin):
@@ -64,6 +78,16 @@ class Tokenizer:
             if self.position >= len(self.origin):
                 self.current = Token(T_EOE)
                 return self.current
+
+        if self.origin[self.position] == '/':
+            self.current = Token(T_DIV)
+            self.position += 1
+            return self.current
+
+        if self.origin[self.position] == '*':
+            self.current = Token(T_MULTI)
+            self.position += 1
+            return self.current
 
         if self.origin[self.position] == '+':
             self.current = Token(T_PLUS)
@@ -92,42 +116,88 @@ class Tokenizer:
 
 
 class Parser:
-    tokens: Tokenizer = None
+    tokens = None
 
     @staticmethod
-    def parseExpression():
+    def parse_expression():
         tokens = Parser.tokens
-        accumulator = tokens.selectNext().value
 
-        while tokens.current.type != T_EOE:
-            currentToken = tokens.selectNext()
-            nextToken = tokens.selectNext()
+        N = Parser.parse_term()
 
-            if currentToken.type == T_EOE:
-                continue
+        if tokens.current.type not in [T_PLUS, T_MINUS, T_EOE]:
+            error_message = f'Expected "+" or "-" and got "{tokens.current}"'
+            raise SyntaxError(error_message)
 
-            if currentToken.type == T_PLUS and nextToken.type == T_INT:
-                accumulator += nextToken.value
-            elif currentToken.type == T_MINUS and nextToken.type == T_INT:
-                accumulator -= nextToken.value
-            else:
-                errorMessage = f"Invalid expression. {currentToken} {nextToken}"
-                raise InvalidExpression(errorMessage)
+        while tokens.current.type in [T_PLUS, T_MINUS]:
 
-        return accumulator
+            if tokens.current.type == T_PLUS:
+                tokens.select_next()
+                N += Parser.parse_term()
+
+            elif tokens.current.type == T_MINUS:
+                tokens.select_next()
+                N -= Parser.parse_term()
+
+        return N
+
+    @staticmethod
+    def parse_term():
+        tokens = Parser.tokens
+
+        if tokens.current.type != T_INT:
+            raise SyntaxError(f"Expected number and got {tokens.current}")
+
+        N = tokens.current.value  # number
+
+        # tokens.select_next()
+        # while tokens.current.type in [T_DIV, T_MULTI]:
+        while tokens.select_next().type in [T_DIV, T_MULTI]:
+
+            if tokens.current.type == T_DIV:
+                tokens.select_next()
+                N = int(N / tokens.current.value)
+
+            elif tokens.current.type == T_MULTI:
+                tokens.select_next()
+                N = int(N * tokens.current.value)
+
+            elif tokens.current.type == T_INT:
+                error_message = f'Expected "*", "/", "+" or "-" and got {tokens.current}'
+                raise SyntaxError(error_message)
+
+            # tokens.select_next()
+
+        return N
 
     @staticmethod
     def run(code):
         Parser.tokens = Tokenizer(code)
-        return Parser.parseExpression()
+        Parser.tokens.select_next()
+        return Parser.parse_expression()
 
 
 def main(case):
-    result = Parser.run(case)
-    print(result)
+    processed = PrePro.filter(case)
+    result = Parser.run(processed)
     return result
 
 
 if __name__ == '__main__':
     case = argv[1]
-    main(case)
+    print(main(case))
+    # cases = [
+    #     # casos sem erro
+    #     '/* abc */ 1 + 2 - 3 /* def */',
+    #     '1 + 2 * 3 - 4',
+    #     '1 + 2',
+    #     '1 - 3',
+    #     '2 * 3',
+    #     '2 + 3 * 4 + 7 / 7',
+    #     '1 + 1 + 1 * 1 / 1',
+    #     # casos com erro
+    #     # '+1',
+    #     # '-2',
+    #     # '2 + +'
+    # ]
+    # for case in cases:
+    #     main(case)
