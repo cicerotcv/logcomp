@@ -183,21 +183,5 @@ def main(case):
 
 
 if __name__ == '__main__':
-    case = argv[1] # teste
+    case = argv[1]
     print(main(case))
-    # cases = [
-    #     # casos sem erro
-    #     '/* abc */ 1 + 2 - 3 /* def */',
-    #     '1 + 2 * 3 - 4',
-    #     '1 + 2',
-    #     '1 - 3',
-    #     '2 * 3',
-    #     '2 + 3 * 4 + 7 / 7',
-    #     '1 + 1 + 1 * 1 / 1',
-    #     # casos com erro
-    #     # '+1',
-    #     # '-2',
-    #     # '2 + +'
-    # ]
-    # for case in cases:
-    #     main(case)
