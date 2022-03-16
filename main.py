@@ -8,8 +8,8 @@ T_MINUS = 'minus'
 T_MULTI = 'multi'
 T_DIV = 'div'
 T_EOE = 'end_of_expression'
-T_OBRACKET = '(_'
-T_CBRACKET = '_)'
+T_OBRACKET = '('
+T_CBRACKET = ')'
 
 # errors
 E_TOKEN_ERROR = 'invalid_token'
@@ -136,9 +136,8 @@ class Parser:
 
         N = Parser.parse_term()
 
-        # if tokens.current.type not in [T_PLUS, T_MINUS, T_EOE]:
-        #     error_message = f'Expected "+" or "-" and got "{tokens.current}"'
-        #     raise SyntaxError(error_message)
+        if tokens.current.type == T_INT:
+            raise SyntaxError(f"Unexpected token: {tokens.current}")
 
         while tokens.current.type in [T_PLUS, T_MINUS]:
 
@@ -162,13 +161,11 @@ class Parser:
 
             if tokens.current.type == T_DIV:
                 tokens.select_next()
-                number = Parser.parse_factor()
-                N = int(N / number)
+                N = int(N / Parser.parse_factor())
 
             elif tokens.current.type == T_MULTI:
                 tokens.select_next()
-                number = Parser.parse_factor()
-                N = int(N * number)
+                N = int(N * Parser.parse_factor())
 
             else:
                 error_message = f'Expected "*", "/", "+" or "-" and got {tokens.current}'
@@ -197,12 +194,12 @@ class Parser:
             N = Parser.parse_expression()
 
             if tokens.current.type != T_CBRACKET:
-                raise SyntaxError("Bracket doesn't close")
+                raise SyntaxError("Brackets doesn't close")
 
             tokens.select_next()
 
         else:
-            raise SyntaxError(f"Unexpected token {tokens.current}")
+            raise SyntaxError(f"Unexpected token: {tokens.current}")
 
         return N
 
@@ -210,7 +207,10 @@ class Parser:
     def run(code):
         Parser.tokens = Tokenizer(code)
         Parser.tokens.select_next()
-        return Parser.parse_expression()
+        N = Parser.parse_expression()
+        if Parser.tokens.current.type != T_EOE:
+            raise SyntaxError(f"Unexpected token: {Parser.tokens.current}")
+        return N
 
 
 def main(case):
@@ -230,6 +230,5 @@ if __name__ == '__main__':
     #     '(2*2'  # error
     # ]
     # for case in cases:
-        # print(f'case: {case}')
-        # print(f'R: {main(case)}\n')
-    
+    # print(f'case: {case}')
+    # print(f'R: {main(case)}\n')
