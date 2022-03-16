@@ -8,6 +8,8 @@ T_MINUS = 'minus'
 T_MULTI = 'multi'
 T_DIV = 'div'
 T_EOE = 'end_of_expression'
+T_OBRACKET = '(_'
+T_CBRACKET = '_)'
 
 # errors
 E_TOKEN_ERROR = 'invalid_token'
@@ -99,6 +101,16 @@ class Tokenizer:
             self.position += 1
             return self.current
 
+        if self.origin[self.position] == '(':
+            self.current = Token(T_OBRACKET)
+            self.position += 1
+            return self.current
+
+        if self.origin[self.position] == ')':
+            self.current = Token(T_CBRACKET)
+            self.position += 1
+            return self.current
+
         if self.origin[self.position].isdigit():
             candidate = ''
 
@@ -124,9 +136,9 @@ class Parser:
 
         N = Parser.parse_term()
 
-        if tokens.current.type not in [T_PLUS, T_MINUS, T_EOE]:
-            error_message = f'Expected "+" or "-" and got "{tokens.current}"'
-            raise SyntaxError(error_message)
+        # if tokens.current.type not in [T_PLUS, T_MINUS, T_EOE]:
+        #     error_message = f'Expected "+" or "-" and got "{tokens.current}"'
+        #     raise SyntaxError(error_message)
 
         while tokens.current.type in [T_PLUS, T_MINUS]:
 
@@ -144,28 +156,53 @@ class Parser:
     def parse_term():
         tokens = Parser.tokens
 
-        if tokens.current.type != T_INT:
-            raise SyntaxError(f"Expected number and got {tokens.current}")
+        N = Parser.parse_factor()  # number
 
-        N = tokens.current.value  # number
-
-        # tokens.select_next()
-        # while tokens.current.type in [T_DIV, T_MULTI]:
-        while tokens.select_next().type in [T_DIV, T_MULTI]:
+        while tokens.current.type in [T_DIV, T_MULTI]:
 
             if tokens.current.type == T_DIV:
                 tokens.select_next()
-                N = int(N / tokens.current.value)
+                number = Parser.parse_factor()
+                N = int(N / number)
 
             elif tokens.current.type == T_MULTI:
                 tokens.select_next()
-                N = int(N * tokens.current.value)
+                number = Parser.parse_factor()
+                N = int(N * number)
 
-            elif tokens.current.type == T_INT:
+            else:
                 error_message = f'Expected "*", "/", "+" or "-" and got {tokens.current}'
                 raise SyntaxError(error_message)
 
-            # tokens.select_next()
+        return N
+
+    @staticmethod
+    def parse_factor():
+        tokens = Parser.tokens
+
+        if tokens.current.type == T_INT:
+            N = tokens.current.value
+            tokens.select_next()
+
+        elif tokens.current.type == T_PLUS:
+            tokens.select_next()
+            N = Parser.parse_factor()
+
+        elif tokens.current.type == T_MINUS:
+            tokens.select_next()
+            N = -Parser.parse_factor()
+
+        elif tokens.current.type == T_OBRACKET:
+            tokens.select_next()
+            N = Parser.parse_expression()
+
+            if tokens.current.type != T_CBRACKET:
+                raise SyntaxError("Bracket doesn't close")
+
+            tokens.select_next()
+
+        else:
+            raise SyntaxError(f"Unexpected token {tokens.current}")
 
         return N
 
@@ -185,3 +222,14 @@ def main(case):
 if __name__ == '__main__':
     case = argv[1]
     print(main(case))
+    # cases = [
+    #     '(3 + 2) /5',  # 1
+    #     '+--++3',  # 3
+    #     '3 - -2/4',  # 3
+    #     '4/(1+1)*2',  # 4
+    #     '(2*2'  # error
+    # ]
+    # for case in cases:
+        # print(f'case: {case}')
+        # print(f'R: {main(case)}\n')
+    
