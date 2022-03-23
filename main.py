@@ -2,6 +2,7 @@
 from sys import argv
 
 from compiler import Parser, PrePro
+from utils import load_file
 
 
 def main(case):
@@ -12,16 +13,6 @@ def main(case):
 
 
 if __name__ == '__main__':
-    case = argv[1]
-    print(main(case))
-
-    # cases = [
-    #     '(3 + 2) /5',  # 1
-    #     '+--++3',  # 3
-    #     '3 - -2/4',  # 3
-    #     '4/(1+1)*2',  # 4
-    #     '(2*2'  # error
-    # ]
-    # for case in cases:
-    # print(f'case: {case}')
-    # print(f'R: {main(case)}\n')
+    filepath = argv[1]
+    content = load_file(filepath)
+    print(main(content))

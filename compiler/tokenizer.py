@@ -1,6 +1,6 @@
 
 from .token import (T_CBRACKET, T_DIV, T_EOE, T_INT, T_MINUS, T_MULTI,
-                            T_OBRACKET, T_PLUS, Token)
+                    T_OBRACKET, T_PLUS, Token)
 from .errors import InvalidToken
 
 

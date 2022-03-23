@@ -1,3 +1,4 @@
+from .node import BinOp, IntVal, UnOp
 from .token import (T_CBRACKET, T_DIV, T_EOE, T_INT, T_MINUS, T_MULTI,
                     T_OBRACKET, T_PLUS)
 from .errors import SyntaxError
@@ -20,11 +21,13 @@ class Parser:
 
             if tokens.current.type == T_PLUS:
                 tokens.select_next()
-                N += Parser.parse_term()
+                # N += Parser.parse_term()
+                N = BinOp(T_PLUS, [N, Parser.parse_term()])
 
             elif tokens.current.type == T_MINUS:
                 tokens.select_next()
-                N -= Parser.parse_term()
+                # N -= Parser.parse_term()
+                N = BinOp(T_MINUS, [N, Parser.parse_term()])
 
         return N
 
@@ -32,17 +35,19 @@ class Parser:
     def parse_term():
         tokens = Parser.tokens
 
-        N = Parser.parse_factor()  # number
+        N = Parser.parse_factor()  # node
 
         while tokens.current.type in [T_DIV, T_MULTI]:
 
             if tokens.current.type == T_DIV:
                 tokens.select_next()
-                N = int(N / Parser.parse_factor())
+                # N = int(N / Parser.parse_factor())
+                N = BinOp(T_DIV, [N, Parser.parse_factor()])
 
             elif tokens.current.type == T_MULTI:
                 tokens.select_next()
-                N = int(N * Parser.parse_factor())
+                # N = int(N * Parser.parse_factor())
+                N = BinOp(T_MULTI, [N, Parser.parse_factor()])
 
             else:
                 error_message = f'Expected "*", "/", "+" or "-" and got {tokens.current}'
@@ -55,19 +60,22 @@ class Parser:
         tokens = Parser.tokens
 
         if tokens.current.type == T_INT:
-            N = tokens.current.value
+            N = IntVal(tokens.current.value)
             tokens.select_next()
 
         elif tokens.current.type == T_PLUS:
             tokens.select_next()
-            N = Parser.parse_factor()
+            # N = Parser.parse_factor()
+            N = UnOp(T_PLUS, [Parser.parse_factor()])
 
         elif tokens.current.type == T_MINUS:
             tokens.select_next()
-            N = -Parser.parse_factor()
+            # N = -Parser.parse_factor()
+            N = UnOp(T_MINUS, [Parser.parse_factor()])
 
         elif tokens.current.type == T_OBRACKET:
             tokens.select_next()
+            # N = Parser.parse_expression()
             N = Parser.parse_expression()
 
             if tokens.current.type != T_CBRACKET:
