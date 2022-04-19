@@ -1,8 +1,9 @@
+from symtable import Symbol
 from typing import List
 
 from compiler.token import T_DIV, T_MINUS, T_MULTI, T_PLUS
-
-from .errors import OperationError
+from compiler.errors import OperationError
+from compiler.symboltable import SymbolTable
 
 
 class Node:
@@ -56,3 +57,27 @@ class IntVal(Node):
 class NoOp(Node):
     def evaluate(self):
         pass
+
+
+class Identifier(Node):
+    def evaluate(self):
+        return SymbolTable.get(self.value)
+
+
+class Assignment(Node):
+    def evaluate(self):
+        identifier, value = self.children
+        SymbolTable.set(identifier.value, value.evaluate())
+        # print(f"Assigned '{SymbolTable.get(identifier.value)}' to '{identifier.value}'")
+
+
+class Reserved(Node):
+    def evaluate(self):
+        if self.value == 'printf':
+            print(self.children[0].evaluate())
+
+
+class Block(Node):
+    def evaluate(self):
+        for child in self.children:
+            child.evaluate()

@@ -1,7 +1,12 @@
 
-from .token import (T_CBRACKET, T_DIV, T_EOE, T_INT, T_MINUS, T_MULTI,
-                    T_OBRACKET, T_PLUS, Token)
+from .token import (T_ASSIGNMENT, T_C_CURLYBRACKET, T_CBRACKET, T_DIV, T_EOE, T_IDENTIFIER, T_INT, T_MINUS, T_MULTI, T_O_CURLYBRACKET,
+                    T_OBRACKET, T_PLUS, T_RESERVED, T_SEMICOLON, Token)
 from .errors import InvalidToken
+
+from string import ascii_letters, digits
+
+ALLOWED_CHARS = ascii_letters + digits + "_"
+RESERVED_WORDS = ['printf']
 
 
 class Tokenizer:
@@ -18,7 +23,7 @@ class Tokenizer:
             return self.current
 
         # consumir espaços
-        while self.origin[self.position] == ' ':
+        while self.origin[self.position] in [' ', '\n']:
             self.position += 1
             if self.position >= len(self.origin):
                 self.current = Token(T_EOE)
@@ -52,6 +57,43 @@ class Tokenizer:
         if self.origin[self.position] == ')':
             self.current = Token(T_CBRACKET)
             self.position += 1
+            return self.current
+
+        if self.origin[self.position] == '{':
+            self.current = Token(T_O_CURLYBRACKET)
+            self.position += 1
+            return self.current
+
+        if self.origin[self.position] == '}':
+            self.current = Token(T_C_CURLYBRACKET)
+            self.position += 1
+            return self.current
+
+        if self.origin[self.position] == '=':
+            self.current = Token(T_ASSIGNMENT)
+            self.position += 1
+            return self.current
+
+        if self.origin[self.position] == ';':
+            self.current = Token(T_SEMICOLON)
+            self.position += 1
+            return self.current
+
+        # garante que inicial com caractere
+        if self.origin[self.position].isalpha():
+            candidate = ''
+
+            while self.origin[self.position] in ALLOWED_CHARS:
+                candidate += self.origin[self.position]
+                self.position += 1
+                if self.position >= len(self.origin):
+                    break
+
+            if candidate in RESERVED_WORDS:
+                self.current = Token(T_RESERVED, candidate)
+            else:
+                self.current = Token(T_IDENTIFIER, candidate)
+
             return self.current
 
         if self.origin[self.position].isdigit():

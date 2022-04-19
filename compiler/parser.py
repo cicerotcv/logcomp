@@ -1,12 +1,73 @@
-from .node import BinOp, IntVal, UnOp
-from .token import (T_CBRACKET, T_DIV, T_EOE, T_INT, T_MINUS, T_MULTI,
-                    T_OBRACKET, T_PLUS)
+from bs4 import Stylesheet
+from .node import Assignment, BinOp, Block, Identifier, IntVal, NoOp, Reserved, UnOp
+from .token import (T_ASSIGNMENT, T_C_CURLYBRACKET, T_CBRACKET, T_DIV, T_EOE, T_IDENTIFIER, T_INT, T_MINUS, T_MULTI, T_O_CURLYBRACKET,
+                    T_OBRACKET, T_PLUS, T_RESERVED, T_SEMICOLON)
 from .errors import SyntaxError
 from .tokenizer import Tokenizer
+from .symboltable import SymbolTable
 
 
 class Parser:
     tokens = None
+
+    @staticmethod
+    def parse_block():
+
+        tokens = Parser.tokens
+
+        if tokens.current.type != T_O_CURLYBRACKET:
+            raise SyntaxError(f"Missing block starting curly bracket.")
+        tokens.select_next()
+
+        block = Block(None, [])
+
+        while tokens.current.type != T_C_CURLYBRACKET:
+            block.children.append(Parser.parse_statement())
+
+        tokens.select_next()
+
+        return block
+
+    @staticmethod
+    def parse_statement():
+        tokens = Parser.tokens
+        statement = NoOp(None)
+
+        if tokens.current.type == T_IDENTIFIER:
+            identifier = Identifier(tokens.current.value)
+            tokens.select_next()
+
+            if tokens.current.type != T_ASSIGNMENT:
+                raise SyntaxError(
+                    f"Expected '{T_ASSIGNMENT}' and got {tokens.current.type}")
+
+            tokens.select_next()  # consome '='
+
+            statement = Assignment('assignment', [identifier, Parser.parse_expression()])
+
+        elif tokens.current.type == T_RESERVED:
+            reserved = tokens.current
+            tokens.select_next()
+
+            if tokens.current.type != T_OBRACKET:
+                raise SyntaxError(
+                    f"Expected '{T_OBRACKET}' and got '{tokens.current.type}'")
+            tokens.select_next()
+
+            statement = Reserved(reserved.value, [Parser.parse_expression()])
+
+            if tokens.current.type != T_CBRACKET:
+                raise SyntaxError(
+                    f"Expected '{T_CBRACKET}' and got '{tokens.current.type}'")
+
+            tokens.select_next()
+
+        if tokens.current.type != T_SEMICOLON:
+            raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
+
+        tokens.select_next()
+
+        return statement
 
     @staticmethod
     def parse_expression():
@@ -63,6 +124,10 @@ class Parser:
             N = IntVal(tokens.current.value)
             tokens.select_next()
 
+        elif tokens.current.type == T_IDENTIFIER:
+            N = Identifier(tokens.current.value)
+            tokens.select_next()
+
         elif tokens.current.type == T_PLUS:
             tokens.select_next()
             # N = Parser.parse_factor()
@@ -92,7 +157,7 @@ class Parser:
     def run(code):
         Parser.tokens = Tokenizer(code)
         Parser.tokens.select_next()
-        N = Parser.parse_expression()
+        block = Parser.parse_block()
         if Parser.tokens.current.type != T_EOE:
             raise SyntaxError(f"Unexpected token: {Parser.tokens.current}")
-        return N
+        return block
