@@ -1,4 +1,3 @@
-from symtable import Symbol
 from typing import List
 
 from compiler.token import T_DIV, T_MINUS, T_MULTI, T_PLUS

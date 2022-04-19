@@ -1,10 +1,10 @@
-from bs4 import Stylesheet
-from .node import Assignment, BinOp, Block, Identifier, IntVal, NoOp, Reserved, UnOp
-from .token import (T_ASSIGNMENT, T_C_CURLYBRACKET, T_CBRACKET, T_DIV, T_EOE, T_IDENTIFIER, T_INT, T_MINUS, T_MULTI, T_O_CURLYBRACKET,
-                    T_OBRACKET, T_PLUS, T_RESERVED, T_SEMICOLON)
 from .errors import SyntaxError
+from .node import (Assignment, BinOp, Block, Identifier, IntVal, NoOp,
+                   Reserved, UnOp)
+from .token import (T_ASSIGNMENT, T_C_CURLYBRACKET, T_CBRACKET, T_DIV, T_EOE,
+                    T_IDENTIFIER, T_INT, T_MINUS, T_MULTI, T_O_CURLYBRACKET,
+                    T_OBRACKET, T_PLUS, T_RESERVED, T_SEMICOLON)
 from .tokenizer import Tokenizer
-from .symboltable import SymbolTable
 
 
 class Parser:
@@ -43,7 +43,8 @@ class Parser:
 
             tokens.select_next()  # consome '='
 
-            statement = Assignment('assignment', [identifier, Parser.parse_expression()])
+            statement = Assignment(
+                'assignment', [identifier, Parser.parse_expression()])
 
         elif tokens.current.type == T_RESERVED:
             reserved = tokens.current

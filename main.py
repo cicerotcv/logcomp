@@ -2,7 +2,6 @@
 from sys import argv
 
 from compiler import Parser, PrePro
-from compiler.symboltable import SymbolTable
 from utils import load_file
 
 
