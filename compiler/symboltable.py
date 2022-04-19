@@ -6,7 +6,7 @@ class SymbolTable:
         if identifier not in SymbolTable._identifiers:
             raise Exception(":D")
 
-        return  SymbolTable._identifiers[identifier]
+        return SymbolTable._identifiers[identifier]
 
     @staticmethod
     def set(identifier, value):
