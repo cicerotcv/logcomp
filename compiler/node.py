@@ -14,6 +14,12 @@ class Node:
     def evaluate(self):
         pass
 
+    def __repr__(self):
+        name = self.__class__.__name__
+        if self.children is None:
+            return f"<{name}:{self.value}>"
+        return f"<{name}:{self.value}:[{self.children}]>"
+
 
 class BinOp(Node):
     """Realiza operações binárias. Contém dois nós filhos"""

@@ -37,7 +37,7 @@ class Parser:
         statement = NoOp(None)
 
         if tokens.current.type == D_SEMICOLON:
-            raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
+            tokens.select_next()
 
         elif tokens.current.type == T_IDENTIFIER:
             identifier = Identifier(tokens.current.value)
@@ -48,8 +48,7 @@ class Parser:
 
             tokens.select_next()
 
-            statement = Assignment(
-                'assignment', [identifier, Parser.parse_rel_expression()])
+            statement = Assignment('assignment', [identifier, Parser.parse_rel_expression()])
 
             if tokens.current.type != D_SEMICOLON:
                 raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
@@ -216,10 +215,11 @@ class Parser:
 
         elif tokens.current.type == D_OBRACKET:
             tokens.select_next()
-            N = Parser.parse_expression()
+
+            N = Parser.parse_rel_expression()
 
             if tokens.current.type != D_CBRACKET:
-                raise SyntaxError("Brackets doesn't close")
+                raise SyntaxError(f"Expected ')' and got {tokens.current}")
 
             tokens.select_next()
 
@@ -229,14 +229,12 @@ class Parser:
             tokens.select_next()
 
             if tokens.current.type != D_OBRACKET:
-                raise SyntaxError(
-                    f"Expected '(' and got {tokens.current.type}")
+                raise SyntaxError(f"Expected '(' and got {tokens.current}")
 
             tokens.select_next()
 
             if tokens.current.type != D_CBRACKET:
-                raise SyntaxError(
-                    f"Expected ')' and got {tokens.current.type}")
+                raise SyntaxError(f"Expected ')' and got {tokens.current}")
 
             tokens.select_next()
 

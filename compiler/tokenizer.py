@@ -83,6 +83,7 @@ class Tokenizer:
             self.position += 1
             if self.position < len(self.origin) and self.origin[self.position] == '=':
                 self.current = Token(LOG_EQ)
+                self.position += 1
             else:
                 self.current = Token(OP_ASSIGNMENT)
             return self.current
@@ -95,7 +96,7 @@ class Tokenizer:
         if self.origin[self.position] == '|':
             self.position += 1
 
-            if self.position >= len(self.origin) or self.current[self.position] != "|":
+            if self.position >= len(self.origin) or self.origin[self.position] != "|":
                 raise InvalidToken(f"Expected '||' and got '|'")
 
             self.position += 1
@@ -105,7 +106,7 @@ class Tokenizer:
         if self.origin[self.position] == '&':
             self.position += 1
 
-            if self.position >= len(self.origin) or self.current[self.position] != "&":
+            if self.position >= len(self.origin) or self.origin[self.position] != "&":
                 raise InvalidToken(f"Expected '&&' and got '&'")
 
             self.position += 1
