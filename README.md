@@ -11,3 +11,7 @@ $ python3.8 -m pytest -v --no-header
 ## Diagrama
 
 ![diagrama](./diagrama.png)
+
+## Figma
+
+[Clique aqui](https://www.figma.com/file/FwgHMDOpuHXPAxmSICtWKg/Diagrama-Lógica-de-Computação) para visualizar o diagrama no Figma.
