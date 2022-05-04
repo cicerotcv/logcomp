@@ -1,5 +1,6 @@
 from compiler.constants import (D_C_CURLYBRACKET, D_CBRACKET, D_O_CURLYBRACKET,
-                                D_OBRACKET, D_SEMICOLON, LOG_AND, LOG_EQ, LOG_GT, LOG_LT, LOG_OR, OP_ASSIGNMENT, OP_DIV,
+                                D_OBRACKET, D_SEMICOLON, LOG_AND, LOG_EQ,
+                                LOG_GT, LOG_LT, LOG_OR, OP_ASSIGNMENT, OP_DIV,
                                 OP_MINUS, OP_MULTI, OP_NOT, OP_PLUS, T_EOE,
                                 T_IDENTIFIER, T_INT)
 from compiler.token import Token
