@@ -1,3 +1,4 @@
-{
-    printf(scanf());
+{   
+    x = scanf();
+    printf(x);
 }

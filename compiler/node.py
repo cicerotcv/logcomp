@@ -95,7 +95,8 @@ class Printf(Node):
 
 class Scanf(Node):
     def evaluate(self):
-        return int(input("Insira um número para o scanf: "))
+        # return int(input("Insira um número para o scanf: "))
+        return int(input())
 
 
 class While(Node):
