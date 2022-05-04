@@ -11,9 +11,9 @@ T_INT = 'int'
 OP_PLUS = 'plus'
 OP_MINUS = 'minus'
 OP_MULTI = 'multi'
-OP_ASSIGNMENT = 'assignment'
 OP_DIV = 'div'
 OP_NOT = 'not'
+OP_ASSIGNMENT = 'assignment'
 
 # -*- delimiters -*-
 D_OBRACKET = '('
@@ -26,8 +26,8 @@ D_SEMICOLON = ';'
 LOG_OR = 'logical_or'
 LOG_AND = 'logical_and'
 LOG_EQ = 'logical_eq'
-LOG_LT = 'less_than'
 LOG_GT = 'greater_than'
+LOG_LT = 'less_than'
 
 # -*- Reserved words -*-
 R_PRINTF = 'printf'
@@ -38,5 +38,4 @@ R_ELSE = 'else'
 
 # -*- special -*-
 T_IDENTIFIER = 'identifier'
-
 T_EOE = 'end_of_expression'
