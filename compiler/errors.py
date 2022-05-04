@@ -1,8 +1,5 @@
-# errors
-E_TOKEN_ERROR = 'invalid_token'
-E_SYNTAX_ERROR = 'syntax_error'
-E_OPERATION_ERROR = 'operation_error'
-E_MISSING_IDENTIFIER = 'missing_identifier'
+from compiler.constants import (E_MISSING_IDENTIFIER, E_SYNTAX_ERROR,
+                                E_TOKEN_ERROR)
 
 
 class Error(Exception):

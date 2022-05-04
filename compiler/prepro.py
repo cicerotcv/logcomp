@@ -1,4 +1,4 @@
-from .errors import SyntaxError
+from compiler.errors import SyntaxError
 
 
 class PrePro:

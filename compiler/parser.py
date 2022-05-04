@@ -1,10 +1,13 @@
-from .errors import SyntaxError
-from .node import (Assignment, BinOp, Block, Identifier, IntVal, NoOp,
-                   Reserved, UnOp)
-from .token import (T_ASSIGNMENT, T_C_CURLYBRACKET, T_CBRACKET, T_DIV, T_EOE,
-                    T_IDENTIFIER, T_INT, T_MINUS, T_MULTI, T_O_CURLYBRACKET,
-                    T_OBRACKET, T_PLUS, T_RESERVED, T_SEMICOLON)
-from .tokenizer import Tokenizer
+from compiler.constants import (D_C_CURLYBRACKET, D_CBRACKET, D_O_CURLYBRACKET,
+                                D_OBRACKET, D_SEMICOLON, LOG_AND, LOG_EQ,
+                                LOG_GT, LOG_LT, LOG_OR, OP_ASSIGNMENT, OP_DIV,
+                                OP_MINUS, OP_MULTI, OP_NOT, OP_PLUS, R_ELSE,
+                                R_IF, R_PRINTF, R_SCANF, R_WHILE, T_EOE,
+                                T_IDENTIFIER, T_INT)
+from compiler.errors import SyntaxError
+from compiler.node import (Assignment, BinOp, Block, Identifier, If, IntVal,
+                           NoOp, Printf, Scanf, UnOp, While)
+from compiler.tokenizer import Tokenizer
 
 
 class Parser:
@@ -15,13 +18,13 @@ class Parser:
 
         tokens = Parser.tokens
 
-        if tokens.current.type != T_O_CURLYBRACKET:
+        if tokens.current.type != D_O_CURLYBRACKET:
             raise SyntaxError(f"Missing block starting curly bracket.")
         tokens.select_next()
 
         block = Block(None, [])
 
-        while tokens.current.type != T_C_CURLYBRACKET:
+        while tokens.current.type != D_C_CURLYBRACKET:
             block.children.append(Parser.parse_statement())
 
         tokens.select_next()
@@ -33,42 +36,108 @@ class Parser:
         tokens = Parser.tokens
         statement = NoOp(None)
 
-        if tokens.current.type == T_IDENTIFIER:
+        if tokens.current.type == D_SEMICOLON:
+            raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
+
+        elif tokens.current.type == T_IDENTIFIER:
             identifier = Identifier(tokens.current.value)
             tokens.select_next()
 
-            if tokens.current.type != T_ASSIGNMENT:
-                raise SyntaxError(
-                    f"Expected '{T_ASSIGNMENT}' and got {tokens.current.type}")
+            if tokens.current.type != OP_ASSIGNMENT:
+                raise SyntaxError(f"Expected '{OP_ASSIGNMENT}' and got {tokens.current.type}")
 
-            tokens.select_next()  # consome '='
+            tokens.select_next()
 
             statement = Assignment(
-                'assignment', [identifier, Parser.parse_expression()])
+                'assignment', [identifier, Parser.parse_rel_expression()])
 
-        elif tokens.current.type == T_RESERVED:
+            if tokens.current.type != D_SEMICOLON:
+                raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
+
+            tokens.select_next()
+
+        elif tokens.current.type == R_PRINTF:
             reserved = tokens.current
             tokens.select_next()
 
-            if tokens.current.type != T_OBRACKET:
-                raise SyntaxError(
-                    f"Expected '{T_OBRACKET}' and got '{tokens.current.type}'")
+            if tokens.current.type != D_OBRACKET:
+                raise SyntaxError(f"Expected '{D_OBRACKET}' and got '{tokens.current.type}'")
             tokens.select_next()
 
-            statement = Reserved(reserved.value, [Parser.parse_expression()])
+            statement = Printf(reserved.value, [Parser.parse_rel_expression()])
 
-            if tokens.current.type != T_CBRACKET:
-                raise SyntaxError(
-                    f"Expected '{T_CBRACKET}' and got '{tokens.current.type}'")
+            if tokens.current.type != D_CBRACKET:
+                raise SyntaxError(f"Expected '{D_CBRACKET}' and got '{tokens.current.type}'")
 
             tokens.select_next()
 
-        if tokens.current.type != T_SEMICOLON:
-            raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
+            if tokens.current.type != D_SEMICOLON:
+                raise SyntaxError(f"Expected semicolon and got '{tokens.current}'")
 
-        tokens.select_next()
+            tokens.select_next()
+
+        elif tokens.current.type == R_WHILE:
+            statement = While(tokens.current.value, [])
+            tokens.select_next()
+
+            if tokens.current.type != D_OBRACKET:
+                raise SyntaxError(f"Expected '{D_OBRACKET}' and got '{tokens.current.type}'")
+            tokens.select_next()
+
+            statement.children.append(Parser.parse_rel_expression())
+
+            if tokens.current.type != D_CBRACKET:
+                raise SyntaxError(f"Expected '{D_CBRACKET}' and got '{tokens.current.type}'")
+            tokens.select_next()
+
+            statement.children.append(Parser.parse_statement())
+        
+        elif tokens.current.type == R_IF:
+            statement = If(tokens.current.value, [])
+            tokens.select_next()
+            
+            if tokens.current.type != D_OBRACKET:
+                raise SyntaxError(f"Expected '{D_OBRACKET}' and got '{tokens.current.type}'")
+            tokens.select_next()
+
+            statement.children.append(Parser.parse_rel_expression())
+
+            if tokens.current.type != D_CBRACKET:
+                raise SyntaxError(f"Expected '{D_CBRACKET}' and got '{tokens.current.type}'")
+            tokens.select_next()
+
+            statement.children.append(Parser.parse_statement())
+            
+            if tokens.current.type == R_ELSE:
+                tokens.select_next()
+                statement.children.append(Parser.parse_statement())
+
+        else:
+            statement = Parser.parse_block()
 
         return statement
+
+    @staticmethod
+    def parse_rel_expression():
+        tokens = Parser.tokens
+
+        N = Parser.parse_expression()
+
+        while tokens.current.type in [LOG_EQ, LOG_GT, LOG_LT]:
+
+            if tokens.current.type == LOG_EQ:
+                tokens.select_next()
+                N = BinOp(LOG_EQ, [N, Parser.parse_expression()])
+
+            elif tokens.current.type == LOG_GT:
+                tokens.select_next()
+                N = BinOp(LOG_GT, [N, Parser.parse_expression()])
+
+            elif tokens.current.type == LOG_LT:
+                tokens.select_next()
+                N = BinOp(LOG_LT, [N, Parser.parse_expression()])
+
+        return N
 
     @staticmethod
     def parse_expression():
@@ -79,17 +148,19 @@ class Parser:
         if tokens.current.type == T_INT:
             raise SyntaxError(f"Unexpected token: {tokens.current}")
 
-        while tokens.current.type in [T_PLUS, T_MINUS]:
+        while tokens.current.type in [OP_PLUS, OP_MINUS, LOG_OR]:
 
-            if tokens.current.type == T_PLUS:
+            if tokens.current.type == OP_PLUS:
                 tokens.select_next()
-                # N += Parser.parse_term()
-                N = BinOp(T_PLUS, [N, Parser.parse_term()])
+                N = BinOp(OP_PLUS, [N, Parser.parse_term()])
 
-            elif tokens.current.type == T_MINUS:
+            elif tokens.current.type == OP_MINUS:
                 tokens.select_next()
-                # N -= Parser.parse_term()
-                N = BinOp(T_MINUS, [N, Parser.parse_term()])
+                N = BinOp(OP_MINUS, [N, Parser.parse_term()])
+
+            elif tokens.current.type == LOG_OR:
+                tokens.select_next()
+                N = BinOp(LOG_OR, [N, Parser.parse_term()])
 
         return N
 
@@ -99,20 +170,22 @@ class Parser:
 
         N = Parser.parse_factor()  # node
 
-        while tokens.current.type in [T_DIV, T_MULTI]:
+        while tokens.current.type in [OP_DIV, OP_MULTI, LOG_AND]:
 
-            if tokens.current.type == T_DIV:
+            if tokens.current.type == OP_DIV:
                 tokens.select_next()
-                # N = int(N / Parser.parse_factor())
-                N = BinOp(T_DIV, [N, Parser.parse_factor()])
+                N = BinOp(OP_DIV, [N, Parser.parse_factor()])
 
-            elif tokens.current.type == T_MULTI:
+            elif tokens.current.type == OP_MULTI:
                 tokens.select_next()
-                # N = int(N * Parser.parse_factor())
-                N = BinOp(T_MULTI, [N, Parser.parse_factor()])
+                N = BinOp(OP_MULTI, [N, Parser.parse_factor()])
+
+            elif tokens.current.type == LOG_AND:
+                tokens.select_next()
+                N = BinOp(LOG_AND, [N, Parser.parse_factor()])
 
             else:
-                error_message = f'Expected "*", "/", "+" or "-" and got {tokens.current}'
+                error_message = f'Unexpected {tokens.current}'
                 raise SyntaxError(error_message)
 
         return N
@@ -129,23 +202,41 @@ class Parser:
             N = Identifier(tokens.current.value)
             tokens.select_next()
 
-        elif tokens.current.type == T_PLUS:
+        elif tokens.current.type == OP_PLUS:
             tokens.select_next()
-            # N = Parser.parse_factor()
-            N = UnOp(T_PLUS, [Parser.parse_factor()])
+            N = UnOp(OP_PLUS, [Parser.parse_factor()])
 
-        elif tokens.current.type == T_MINUS:
+        elif tokens.current.type == OP_MINUS:
             tokens.select_next()
-            # N = -Parser.parse_factor()
-            N = UnOp(T_MINUS, [Parser.parse_factor()])
+            N = UnOp(OP_MINUS, [Parser.parse_factor()])
 
-        elif tokens.current.type == T_OBRACKET:
+        elif tokens.current.type == OP_NOT:
             tokens.select_next()
-            # N = Parser.parse_expression()
+            N = UnOp(OP_NOT, [Parser.parse_factor()])
+
+        elif tokens.current.type == D_OBRACKET:
+            tokens.select_next()
             N = Parser.parse_expression()
 
-            if tokens.current.type != T_CBRACKET:
+            if tokens.current.type != D_CBRACKET:
                 raise SyntaxError("Brackets doesn't close")
+
+            tokens.select_next()
+
+        elif tokens.current.type == R_SCANF:
+            N = Scanf('scanf')
+
+            tokens.select_next()
+
+            if tokens.current.type != D_OBRACKET:
+                raise SyntaxError(
+                    f"Expected '(' and got {tokens.current.type}")
+
+            tokens.select_next()
+
+            if tokens.current.type != D_CBRACKET:
+                raise SyntaxError(
+                    f"Expected ')' and got {tokens.current.type}")
 
             tokens.select_next()
 
