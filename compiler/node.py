@@ -29,12 +29,11 @@ class BinOp(Node):
         (type1, value1) = n1.evaluate()
         (type2, value2) = n2.evaluate()
 
-        if self.value == OP_CONCAT and type1 == T_STR:
-            return (T_STR, value1 + str(value2))
+        if self.value == OP_CONCAT:
+            return (T_STR, str(value1) + str(value2))
 
         if type1 != type2:
-            raise OperationError(
-                f"Unexpected operation for types '{type1}' and '{type2}': '{self.value}'")
+            raise OperationError(f"Unexpected operation for types '{type1}' and '{type2}': '{self.value}'")
 
         if self.value == OP_PLUS:
             return (T_INT, value1 + value2)
@@ -70,11 +69,11 @@ class UnOp(Node):
                 f"Unexpected unary operator '{self.value}' for type '{type}'")
 
         if self.value == OP_MINUS:
-            return -value
+            return (T_INT, -value)
         if self.value == OP_PLUS:
-            return value
+            return (T_INT, value)
         if self.value == OP_NOT:
-            return not value
+            return (T_INT, int(not value))
 
         raise OperationError(f"Unexpected value for UnOp: '{self.value}'")
 
@@ -111,14 +110,14 @@ class Assignment(Node):
 
 class Printf(Node):
     def evaluate(self):
-        (type, value) = self.children[0].evaluate()
-        print((type, value))
+        (_, value) = self.children[0].evaluate()
+        print(value)
 
 
 class Scanf(Node):
     def evaluate(self):
         # return int(input("Insira um número para o scanf: "))
-        return IntVal(int(input())).evaluate()
+        return (T_INT, int(input()))
 
 
 class VarDec(Node):
