@@ -1,7 +1,7 @@
 from typing import List
 
-from compiler.constants import (LOG_AND, LOG_EQ, LOG_GT, LOG_LT, LOG_OR,
-                                OP_DIV, OP_MINUS, OP_MULTI, OP_NOT, OP_PLUS)
+from compiler.constants import (LOG_AND, LOG_EQ, LOG_GT, LOG_LT, LOG_OR, OP_CONCAT,
+                                OP_DIV, OP_MINUS, OP_MULTI, OP_NOT, OP_PLUS, T_INT, T_STR)
 from compiler.errors import OperationError
 from compiler.symboltable import SymbolTable
 
@@ -26,25 +26,34 @@ class BinOp(Node):
 
     def evaluate(self):
         n1, n2 = self.children
+        (type1, value1) = n1.evaluate()
+        (type2, value2) = n2.evaluate()
+
+        if self.value == OP_CONCAT and type1 == T_STR:
+            return (T_STR, value1 + str(value2))
+
+        if type1 != type2:
+            raise OperationError(
+                f"Unexpected operation for types '{type1}' and '{type2}': '{self.value}'")
 
         if self.value == OP_PLUS:
-            return n1.evaluate() + n2.evaluate()
+            return (T_INT, value1 + value2)
         if self.value == OP_MINUS:
-            return n1.evaluate() - n2.evaluate()
+            return (T_INT, value1 - value2)
         if self.value == OP_MULTI:
-            return int(n1.evaluate() * n2.evaluate())
+            return (T_INT, value1 * value2)
         if self.value == OP_DIV:
-            return int(n1.evaluate() / n2.evaluate())
+            return (T_INT, value1 // value2)
         if self.value == LOG_AND:
-            return n1.evaluate() and n2.evaluate()
+            return (T_INT, int(value1 and value2))
         if self.value == LOG_OR:
-            return n1.evaluate() or n2.evaluate()
+            return (T_INT, int(value1 or value2))
         if self.value == LOG_EQ:
-            return n1.evaluate() == n2.evaluate()
+            return (T_INT, int(value1 == value2))
         if self.value == LOG_GT:
-            return n1.evaluate() > n2.evaluate()
+            return (T_INT, int(value1 > value2))
         if self.value == LOG_LT:
-            return n1.evaluate() < n2.evaluate()
+            return (T_INT, int(value1 < value2))
 
         raise OperationError(f"Unexpected value for BinOp: '{self.value}'")
 
@@ -54,13 +63,18 @@ class UnOp(Node):
 
     def evaluate(self):
         node = self.children[0]
+        (type, value) = node.evaluate()
+
+        if type != T_INT:
+            raise OperationError(
+                f"Unexpected unary operator '{self.value}' for type '{type}'")
 
         if self.value == OP_MINUS:
-            return -node.evaluate()
+            return -value
         if self.value == OP_PLUS:
-            return node.evaluate()
+            return value
         if self.value == OP_NOT:
-            return not node.evaluate()
+            return not value
 
         raise OperationError(f"Unexpected value for UnOp: '{self.value}'")
 
@@ -69,7 +83,14 @@ class IntVal(Node):
     """Valor inteiro. Contém um único nó filho"""
 
     def evaluate(self):
-        return self.value
+        return (T_INT, self.value)
+
+
+class StrVal(Node):
+    """Valor de string. Contém um único nó filho"""
+
+    def evaluate(self):
+        return (T_STR, self.value)
 
 
 class NoOp(Node):
@@ -90,20 +111,31 @@ class Assignment(Node):
 
 class Printf(Node):
     def evaluate(self):
-        print(self.children[0].evaluate())
+        (type, value) = self.children[0].evaluate()
+        print((type, value))
 
 
 class Scanf(Node):
     def evaluate(self):
         # return int(input("Insira um número para o scanf: "))
-        return int(input())
+        return IntVal(int(input())).evaluate()
+
+
+class VarDec(Node):
+    def evaluate(self):
+        type = self.value
+        for identifier_name in self.children:
+            SymbolTable.declare(type, identifier_name)
 
 
 class While(Node):
     def evaluate(self):
         condition, routine = self.children
-        while condition.evaluate():
+        (_, evaluation) = condition.evaluate()
+
+        while evaluation:
             routine.evaluate()
+            (_, evaluation) = condition.evaluate()
 
 
 class If(Node):
@@ -111,7 +143,8 @@ class If(Node):
         # if { expression } : { this } else: { that }
         if len(self.children) == 3:
             expression, this, that = self.children
-            if (expression.evaluate()):
+            (_, evaluation) = expression.evaluate()
+            if (evaluation):
                 this.evaluate()
             else:
                 that.evaluate()
@@ -119,7 +152,8 @@ class If(Node):
         # if { expression } : { this }
         if len(self.children) == 2:
             expression, this = self.children
-            if (expression.evaluate()):
+            (_, evaluation) = expression.evaluate()
+            if (evaluation):
                 this.evaluate()
 
 

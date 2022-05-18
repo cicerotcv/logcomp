@@ -3,14 +3,19 @@ E_TOKEN_ERROR = 'invalid_token'
 E_SYNTAX_ERROR = 'syntax_error'
 E_OPERATION_ERROR = 'operation_error'
 E_MISSING_IDENTIFIER = 'missing_identifier'
+E_UNDECLARED_IDENTIFIER = 'undeclared_identifier'
+E_UNCLOSING_DELIMITER = 'unclosing_delimiter'
+E_TYPE_ERROR = 'type_error'
 
 # -*- built-in types -*-
 T_INT = 'int'
+T_STR = 'str'
 
 # -*- operators -*-
 OP_PLUS = 'plus'
 OP_MINUS = 'minus'
 OP_MULTI = 'multi'
+OP_CONCAT = 'concat'
 OP_DIV = 'div'
 OP_NOT = 'not'
 OP_ASSIGNMENT = 'assignment'
@@ -21,6 +26,7 @@ D_CBRACKET = ')'
 D_O_CURLYBRACKET = '{'
 D_C_CURLYBRACKET = '}'
 D_SEMICOLON = ';'
+D_COMMA = ','
 
 # -*- logical operators -*-
 LOG_OR = 'logical_or'
@@ -37,5 +43,6 @@ R_IF = 'if'
 R_ELSE = 'else'
 
 # -*- special -*-
+T_TYPE = 'type'
 T_IDENTIFIER = 'identifier'
 T_EOE = 'end_of_expression'
