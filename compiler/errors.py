@@ -1,5 +1,5 @@
 from compiler.constants import (E_MISSING_IDENTIFIER, E_SYNTAX_ERROR,
-                                E_TOKEN_ERROR, E_TYPE_ERROR, E_UNCLOSING_DELIMITER, E_UNDECLARED_IDENTIFIER)
+                                E_TOKEN_ERROR, E_TYPE_ERROR, E_UNCLOSING_DELIMITER, E_IDENTIFIER_ERROR)
 
 
 class Error(Exception):
@@ -32,9 +32,9 @@ class MissingIdentifier(Error):
         super().__init__(E_MISSING_IDENTIFIER, description)
 
 
-class UndeclaredIdentifier(Error):
+class IdentifierError(Error):
     def __init__(self, description) -> None:
-        super().__init__(E_UNDECLARED_IDENTIFIER, description)
+        super().__init__(E_IDENTIFIER_ERROR, description)
 
 
 class TypeError(Error):

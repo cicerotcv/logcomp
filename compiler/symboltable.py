@@ -1,4 +1,4 @@
-from compiler.errors import TypeError, UndeclaredIdentifier
+from compiler.errors import IdentifierError, TypeError
 
 
 class SymbolTable:
@@ -6,6 +6,7 @@ class SymbolTable:
 
     @staticmethod
     def declare(type, identifier):
+        SymbolTable.ensure_not_declared(identifier)
         SymbolTable._identifiers[identifier] = (type, None)
 
     @staticmethod
@@ -20,9 +21,14 @@ class SymbolTable:
         SymbolTable._identifiers[identifier] = value
 
     @staticmethod
+    def ensure_not_declared(identifier_name):
+        if identifier_name in SymbolTable._identifiers.keys():
+            raise IdentifierError("Identifier already declared")
+
+    @staticmethod
     def ensure_declared(identifier_name):
         if identifier_name not in SymbolTable._identifiers.keys():
-            raise UndeclaredIdentifier("Identifier not declared")
+            raise IdentifierError("Identifier not declared")
 
     @staticmethod
     def ensure_same_type(identifier_name, value):
@@ -30,7 +36,8 @@ class SymbolTable:
         (new_type, _) = value
 
         if current_type != new_type:
-            raise TypeError(f"Expected type '{current_type}' and got '{new_type}'")
+            raise TypeError(
+                f"Expected type '{current_type}' and got '{new_type}'")
 
     @staticmethod
     def describe():

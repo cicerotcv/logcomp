@@ -1,4 +1,4 @@
 {
-  str x;
-  x = "a";
+  int x;
+  int x;
 }
