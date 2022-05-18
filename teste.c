@@ -1,4 +1,4 @@
 {
   int x;
-  int x;
+  x = 'single comma string';
 }

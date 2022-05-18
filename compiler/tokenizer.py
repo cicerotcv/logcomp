@@ -12,7 +12,7 @@ from compiler.errors import InvalidToken, UnclosingDelimiter
 from compiler.token import Token
 
 ALLOWED_CHARS = ascii_letters + digits + "_"
-STRING_DELIMITERS = ['\"', "\'"]
+STRING_DELIMITERS = ['\"']
 BUILTIN_TYPES = [T_INT, T_STR]
 RESERVED_WORDS = {
     R_PRINTF: R_PRINTF,

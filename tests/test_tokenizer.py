@@ -7,7 +7,7 @@ from compiler.constants import (D_C_CURLYBRACKET, D_CBRACKET, D_COMMA, D_O_CURLY
                                 T_IDENTIFIER, T_INT, T_STR, T_TYPE)
 from compiler.token import Token
 from compiler.tokenizer import Tokenizer
-from compiler.errors import UnclosingDelimiter
+from compiler.errors import UnclosingDelimiter, InvalidToken
 
 
 def compare_token(a: Token, b: Token):
@@ -39,6 +39,12 @@ class TestBuiltins:
         compare_token(token, expected)
 
     @staticmethod
+    def test_single_quote_exception():
+        origin = '\'Single Comma String\''
+        with pytest.raises(InvalidToken):
+            Tokenizer(origin).select_next()
+
+    @staticmethod
     def test_string_word():
         origin = '"word"'
         token = Tokenizer(origin).select_next()
@@ -53,8 +59,8 @@ class TestBuiltins:
         compare_token(token, expected)
 
     @staticmethod
-    def test_unclosing_exception():
-        origin = '"this is a sentence'
+    def test_unclosing_string_exception():
+        origin = '"this is an unclosed string'
         with pytest.raises(UnclosingDelimiter):
             Tokenizer(origin).select_next()
 
