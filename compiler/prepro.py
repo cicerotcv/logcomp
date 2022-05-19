@@ -12,7 +12,7 @@ class PrePro:
         end = expression.find('*/')
 
         if end == -1:
-            return SyntaxError("Comment block doesn't close")
+            raise SyntaxError("Comment block doesn't close")
 
         replace_string = expression[start:end + 2]
         expression = expression.replace(replace_string, '', 1)
