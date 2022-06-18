@@ -3,8 +3,8 @@ from compiler.constants import (D_C_CURLYBRACKET, D_CBRACKET, D_COMMA, D_O_CURLY
                                 D_OBRACKET, D_SEMICOLON, LOG_AND, LOG_EQ,
                                 LOG_GT, LOG_LT, LOG_OR, OP_ASSIGNMENT, OP_CONCAT, OP_DIV,
                                 OP_MINUS, OP_MULTI, OP_NOT, OP_PLUS, R_ELSE,
-                                R_IF, R_PRINTF, R_SCANF, R_WHILE, T_EOE,
-                                T_IDENTIFIER, T_INT, T_STR, T_TYPE)
+                                R_IF, R_PRINTF, R_RETURN, R_SCANF, R_WHILE, T_EOE,
+                                T_IDENTIFIER, T_INT, T_STR, T_TYPE, T_VOID)
 from compiler.token import Token
 from compiler.tokenizer import Tokenizer
 from compiler.errors import UnclosingDelimiter, InvalidToken
@@ -76,6 +76,13 @@ class TestBuiltins:
         origin = 'int'
         token = Tokenizer(origin).select_next()
         expected = Token(T_TYPE, T_INT)
+        compare_token(token, expected)
+
+    @staticmethod
+    def test_typing_void():
+        origin = 'void'
+        token = Tokenizer(origin).select_next()
+        expected = Token(T_TYPE, T_VOID)
         compare_token(token, expected)
 
     @staticmethod
@@ -245,6 +252,12 @@ class TestReservedWords:
         origin = 'else'
         token = Tokenizer(origin).select_next()
         compare_token(token, Token(R_ELSE))
+
+    @staticmethod
+    def test_else():
+        origin = 'return'
+        token = Tokenizer(origin).select_next()
+        compare_token(token, Token(R_RETURN))
 
 
 class TestTokens:

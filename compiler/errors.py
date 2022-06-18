@@ -1,5 +1,7 @@
-from compiler.constants import (E_MISSING_IDENTIFIER, E_SYNTAX_ERROR,
-                                E_TOKEN_ERROR, E_TYPE_ERROR, E_UNCLOSING_DELIMITER, E_IDENTIFIER_ERROR)
+from compiler.constants import (E_FUNCTION_ERROR, E_IDENTIFIER_ERROR,
+                                E_MISSING_IDENTIFIER, E_OPERATION_ERROR,
+                                E_SYNTAX_ERROR, E_TOKEN_ERROR, E_TYPE_ERROR,
+                                E_UNCLOSING_DELIMITER)
 
 
 class Error(Exception):
@@ -24,7 +26,12 @@ class SyntaxError(Error):
 
 class OperationError(Error):
     def __init__(self, description) -> None:
-        super().__init__(E_SYNTAX_ERROR, description)
+        super().__init__(E_OPERATION_ERROR, description)
+
+
+class FunctionError(Error):
+    def __init__(self, description) -> None:
+        super().__init__(E_FUNCTION_ERROR, description)
 
 
 class MissingIdentifier(Error):

@@ -2,8 +2,8 @@
 E_TOKEN_ERROR = 'invalid_token'
 E_SYNTAX_ERROR = 'syntax_error'
 E_OPERATION_ERROR = 'operation_error'
+E_FUNCTION_ERROR = 'function_error'
 E_MISSING_IDENTIFIER = 'missing_identifier'
-# E_UNDECLARED_IDENTIFIER = 'undeclared_identifier'
 E_IDENTIFIER_ERROR = 'identifier_error'
 E_UNCLOSING_DELIMITER = 'unclosing_delimiter'
 E_TYPE_ERROR = 'type_error'
@@ -11,6 +11,8 @@ E_TYPE_ERROR = 'type_error'
 # -*- built-in types -*-
 T_INT = 'int'
 T_STR = 'str'
+T_VOID = 'void'
+T_FUNCTION = 'function'
 
 # -*- operators -*-
 OP_PLUS = 'plus'
@@ -42,6 +44,7 @@ R_SCANF = 'scanf'
 R_WHILE = 'while'
 R_IF = 'if'
 R_ELSE = 'else'
+R_RETURN = 'return'
 
 # -*- special -*-
 T_TYPE = 'type'
