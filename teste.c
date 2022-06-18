@@ -1,20 +1,34 @@
-int soma(int x, int y) { return (x + y); }
 
-int multi(int x, int y) { return (x * y); }
+void main() {
+  /* v2.2 testing */
+  int x_1;
 
-int main() {
-  int a, b;
-  str x;
+  x_1 = scanf();
+  if ((x_1 > 1) && !(x_1 < 1)) {
+    x_1 = 3;
+  } else {
+    {
+      x_1 = (-20 + 30) * 4 * 3 / 40;
+      ;
+      ;
+      ;
+      ; /* teste de comentario */
+    }
+  }
+  printf(x_1);
+  x_1 = scanf();
+  if ((x_1 > 1) && !(x_1 < 1))
+    x_1 = 3;
+  else
+    x_1 = (-20 + 30) * 12 / 40;
+  ;
+  ;
+  ;
+  ;
 
-  x = "single comma string";
-  a = 3;
-  b = a + 1;
-
-  printf("X = " + x);
-  printf("a = ".a);
-  printf("b = ".b);
-  printf("soma = ".soma(a, b));
-  printf("multi = ".multi(a, b));
-
-  return (0);
+  printf(x_1);
+  while ((x_1 > 1) || (x_1 == 1)) {
+    x_1 = x_1 - 1;
+    printf(x_1);
+  }
 }
