@@ -36,8 +36,7 @@ class SymbolTable:
         (new_type, _) = value
 
         if current_type != new_type:
-            raise TypeError(
-                f"Expected type '{current_type}' and got '{new_type}'")
+            raise TypeError(f"Expected type '{current_type}' and got '{new_type}'")
 
     @staticmethod
     def describe():

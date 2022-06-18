@@ -7,10 +7,25 @@ from compiler.symboltable import SymbolTable
 from compiler.nasm import Nasm
 
 
+def generator():
+    calls = 0
+    while True:
+        yield calls
+        calls += 1
+
+class Generator:
+    _sequence = generator()
+
+    @staticmethod
+    def id():
+        return next()
+
+
 class Node:
     def __init__(self, value, children=None):
         self.value = value
         self.children: List[Node] = children
+        self.id = Generator.id()
 
     def evaluate(self):
         pass
@@ -34,7 +49,8 @@ class BinOp(Node):
             return (T_STR, str(value1) + str(value2))
 
         if type1 != type2:
-            raise OperationError(f"Unexpected operation for types '{type1}' and '{type2}': '{self.value}'")
+            raise OperationError(
+                f"Unexpected operation for types '{type1}' and '{type2}': '{self.value}'")
 
         if self.value == OP_PLUS:
             return (T_INT, value1 + value2)
@@ -83,6 +99,7 @@ class IntVal(Node):
     """Valor inteiro. Contém um único nó filho"""
 
     def evaluate(self):
+        Nasm.put(f"MOV EBX, {self.value};")
         return (T_INT, self.value)
 
 
