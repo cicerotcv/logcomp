@@ -14,6 +14,9 @@ class Queue:
     def __len__(self):
         return len(self._values)
 
+    def __iter__(self):
+        return self._values.__iter__()
+
     @property
     def length(self):
         return len(self)
@@ -38,7 +41,16 @@ class Nasm:
 
     @staticmethod
     def dump(output_file: str):
-        print(read_file('header.txt'))
-        while not Nasm.queue.is_empty:
-            print(Nasm.queue.take())
-        print(read_file('footer.txt'))
+        header = read_file('header.txt')
+        footer = read_file('footer.txt')
+
+        with open(output_file, 'w+') as output_stream:
+            output_stream.write(header)
+            while not Nasm.queue.is_empty:
+                output_stream.write(Nasm.queue.take() + '\n')
+            output_stream.write(footer)
+
+        # print(read_file('header.txt'))
+        # while not Nasm.queue.is_empty:
+        #     print(Nasm.queue.take())
+        # print(read_file('footer.txt'))
