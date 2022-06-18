@@ -222,7 +222,7 @@ class While(Node):
         (_, evaluation) = condition.evaluate(symbol_table)
 
         while evaluation:
-            routine.evaluate()
+            routine.evaluate(symbol_table)
             (_, evaluation) = condition.evaluate(symbol_table)
 
 
