@@ -1,4 +1,5 @@
 {
-  int x;
-  x = 'single comma string';
+  str x;
+  x = "double quote string";
+  printf("x: " + x);
 }

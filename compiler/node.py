@@ -4,6 +4,7 @@ from compiler.constants import (LOG_AND, LOG_EQ, LOG_GT, LOG_LT, LOG_OR, OP_CONC
                                 OP_DIV, OP_MINUS, OP_MULTI, OP_NOT, OP_PLUS, T_INT, T_STR)
 from compiler.errors import OperationError
 from compiler.symboltable import SymbolTable
+from compiler.nasm import Nasm
 
 
 class Node:
