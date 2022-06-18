@@ -1,9 +1,11 @@
 
 
-def read_header(path: str) -> str:
+import os
+
+
+def read_file(path) -> str:
     with open(path, 'r') as header:
         return header.read()
-
 
 class Queue:
     def __init__(self):
@@ -35,6 +37,8 @@ class Nasm:
         Nasm.queue.add(nasm_code)
 
     @staticmethod
-    def dump():
+    def dump(output_file: str):
+        print(read_file('header.txt'))
         while not Nasm.queue.is_empty:
             print(Nasm.queue.take())
+        print(read_file('footer.txt'))

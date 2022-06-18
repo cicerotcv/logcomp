@@ -55,6 +55,7 @@ print_exit:
   RET
 
 ; subrotinas if/while
+
 binop_je:
   JE binop_true
   JMP binop_false
@@ -70,20 +71,14 @@ binop_jl:
 binop_false:
   MOV EBX, False
   JMP binop_exit
+
 binop_true:
   MOV EBX, True
+
 binop_exit:
   RET
 
 _start:
 
-  PUSH EBP ; guarda o base pointer
-  MOV EBP, ESP ; estabelece um novo base pointer
-
-  ; codigo gerado pelo compilador
-
-
-  ; interrupcao de saida
-  POP EBP
-  MOV EAX, 1
-  INT 0x80
+PUSH EBP ; guarda o base pointer
+MOV EBP, ESP ; estabelece um novo base pointer

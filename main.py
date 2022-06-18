@@ -2,6 +2,7 @@
 from sys import argv
 
 from compiler import Parser, PrePro
+from compiler.nasm import Nasm
 from utils import load_file
 
 
@@ -9,6 +10,7 @@ def main(case):
     processed = PrePro.filter(case)
     resulting_node = Parser.run(processed)
     resulting_node.evaluate()
+    Nasm.dump("program.asm")
 
 
 if __name__ == '__main__':

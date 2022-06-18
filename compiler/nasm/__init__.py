@@ -1,1 +1,1 @@
-from nasm import Nasm
+from .nasm import Nasm
