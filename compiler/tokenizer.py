@@ -1,19 +1,20 @@
 
 from string import ascii_letters, digits
 
-from compiler.constants import (D_C_CURLYBRACKET, D_CBRACKET, D_COMMA, D_O_CURLYBRACKET,
-                                D_OBRACKET, D_SEMICOLON, LOG_AND, LOG_EQ,
-                                LOG_GT, LOG_LT, LOG_OR, OP_ASSIGNMENT,
-                                OP_CONCAT, OP_DIV, OP_MINUS, OP_MULTI, OP_NOT,
-                                OP_PLUS, R_ELSE, R_IF, R_PRINTF, R_SCANF,
-                                R_WHILE, T_EOE, T_IDENTIFIER, T_INT, T_STR,
-                                T_TYPE)
+from compiler.constants import (D_C_CURLYBRACKET, D_CBRACKET, D_COMMA,
+                                D_O_CURLYBRACKET, D_OBRACKET, D_SEMICOLON,
+                                LOG_AND, LOG_EQ, LOG_GT, LOG_LT, LOG_OR,
+                                OP_ASSIGNMENT, OP_CONCAT, OP_DIV, OP_MINUS,
+                                OP_MULTI, OP_NOT, OP_PLUS, R_ELSE, R_IF,
+                                R_PRINTF, R_RETURN, R_SCANF, R_WHILE, T_EOE,
+                                T_IDENTIFIER, T_INT, T_STR, T_TYPE, T_VOID)
 from compiler.errors import InvalidToken, UnclosingDelimiter
 from compiler.token import Token
 
 ALLOWED_CHARS = ascii_letters + digits + "_"
 STRING_DELIMITERS = ['\"']
-BUILTIN_TYPES = [T_INT, T_STR]
+BUILTIN_TYPES = [T_INT, T_STR, T_VOID]
+
 RESERVED_WORDS = {
     R_PRINTF: R_PRINTF,
     R_SCANF: R_SCANF,
@@ -21,7 +22,9 @@ RESERVED_WORDS = {
     R_IF: R_IF,
     R_ELSE: R_ELSE,
     T_INT: T_INT,
-    T_STR: T_STR
+    T_STR: T_STR,
+    T_VOID: T_VOID,
+    R_RETURN: R_RETURN
 }
 
 
