@@ -14,14 +14,12 @@ def main(case):
 
 
 if __name__ == '__main__':
-    filepath = argv[1]
-    file = os.path.basename(filepath)
-    content = load_file(filepath)
-    
+    input_path = argv[1]
+    content = load_file(input_path)
+
     main(content)
 
-    stderr.write(f"{filepath} {file.split()}")
+    # trocar a extensão
+    root, ext = os.path.splitext(input_path)
 
-    parts = file.split(".")
-
-    Nasm.dump(f'{parts[0]}.asm')
+    Nasm.dump(f'{root}.asm')
