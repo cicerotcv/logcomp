@@ -193,7 +193,7 @@ class While(Node):
         routine.evaluate()
 
         Nasm.put(f"JMP LOOP_{self.id};")
-        Nasm.put(f"EXIT_{self.id}:\n")
+        Nasm.put(f"EXIT_{self.id}:;\n")
 
         # while evaluation:
         #     routine.evaluate()
@@ -202,7 +202,7 @@ class While(Node):
 
 class If(Node):
     def evaluate(self):
-        Nasm.put(f"IF_{self.id};")
+        Nasm.put(f"IF_{self.id}:;")
 
         # if { expression } : { this } else: { that }
         if len(self.children) == 3:
@@ -212,7 +212,7 @@ class If(Node):
             Nasm.put(f"CMP EBX, False;")
             Nasm.put(f"JE ELSE_{self.id};")
             this.evaluate()
-            Nasm.put(f"ELSE_{self.id};")
+            Nasm.put(f"ELSE_{self.id}:;")
             that.evaluate()
             Nasm.put(f"JMP IF_{self.id}_EXIT;")
 
