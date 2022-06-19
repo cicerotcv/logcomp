@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 import os
-from sys import argv
+from sys import argv, stderr
 
 from compiler import Parser, PrePro
 from compiler.nasm import Nasm
@@ -17,8 +17,11 @@ if __name__ == '__main__':
     filepath = argv[1]
     file = os.path.basename(filepath)
     content = load_file(filepath)
+    
     main(content)
-    print(filepath)
-    print(file.split('.'))
+
+    stderr.write(f"{filepath} {file.split()}")
+
     parts = file.split(".")
+
     Nasm.dump(f'{parts[0]}.asm')
