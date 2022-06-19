@@ -82,6 +82,68 @@ _start:
 
 PUSH EBP ; guarda o base pointer
 MOV EBP, ESP ; estabelece um novo base pointer
+PUSH DWORD 0	; identifier 'i' declaration
+
+PUSH DWORD 0	; identifier 'n' declaration
+
+PUSH DWORD 0	; identifier 'f' declaration
+
+MOV EBX, 5		; EBX = 5
+MOV [EBP-8], EBX	; n = EBX
+
+MOV EBX, 2		; EBX = 2
+MOV [EBP-4], EBX	; i = EBX
+
+MOV EBX, 1		; EBX = 1
+MOV [EBP-12], EBX	; f = EBX
+
+
+LOOP_20:		; Begin LOOP_20
+
+			; LOOP_20 conditions
+MOV EBX, [EBP-4]	; EBX = i
+PUSH EBX;
+MOV EBX, [EBP-8]	; EBX = n
+PUSH EBX;
+MOV EBX, 1		; EBX = 1
+POP EAX;
+ADD EAX, EBX		; EAX += EBX
+MOV EBX, EAX		; EBX = EAX
+POP EAX;
+CMP EAX, EBX;
+CALL binop_jl;
+
+CMP EBX, False;
+JE EXIT_20;
+
+			; LOOP_20 routine
+MOV EBX, [EBP-12]	; EBX = f
+PUSH EBX;
+MOV EBX, [EBP-4]	; EBX = i
+POP EAX;
+IMUL EBX		; EAX *= EBX
+MOV EBX, EAX		; EBX = EAX
+MOV [EBP-12], EBX	; f = EBX
+
+MOV EBX, [EBP-4]	; EBX = i
+PUSH EBX;
+MOV EBX, 1		; EBX = 1
+POP EAX;
+ADD EAX, EBX		; EAX += EBX
+MOV EBX, EAX		; EBX = EAX
+MOV [EBP-4], EBX	; i = EBX
+
+JMP LOOP_20;
+EXIT_20:
+
+
+MOV EBX, [EBP-12]	; EBX = f
+			; Print call
+PUSH EBX;
+CALL print;
+POP EBX;
+
+
 
 ; interrupcao de saida
 POP EBP
