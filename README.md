@@ -15,35 +15,55 @@ $ python3.8 -m pytest -v --no-header
 ## EBNF
 
 ```
-BLOCK = "{" , STATEMENT , "}";
+TOP_LEVEL = { FUNCTION_DECLARATION } ;
 
-STATEMENT =  (λ | ASSIGNMENT | BLOCK | PRINT | IF | WHILE) , ";";
+BLOCK = "{" , { STATEMENT }, "}" ;
 
-REL_EXPRESSION = EXPRESSION, { ("==" | "<" | ">") , EXPRESSION };
+TYPE = "int" | "str" ;
 
-EXPRESSION = TERM, { ("+" | "-" | "||") , TERM };
+TYPE_WITH VOID = TYPE | "void";
 
-TERM = FACTOR, { ("*" | "/" | "&&") };
+IDENTIFIER_DECLARATION = TYPE , IDENTIFIER ;
 
-FACTOR = INT | IDENTIFIER | (("+" | "-" | "!") , FACTOR) | "(", REL_EXPRESSION , ")" | SCANF;
+FUNCTION_DECLARATION = TYPE_WITH_VOID , IDENTIFIER , "(" [ , TYPE, IDENTIFIER [ , { "," , TYPE, IDENTIFIER } ] ] , ")" , FUNCTION_BODY;
 
-ASSIGNMENT = IDENTIFIER , "=" , EXPRESSION;
+FUNCTION_BODY = "{" , { STATEMENT }, [ , FUNCTION_RETURN ] , "}";
 
-PRINT = "printf" , "(" , EXPRESSION , ")";
+FUNCTION_RETURN = "return", EXPRESSION ;
 
-IF = "if" , "(" , REL_EXPRESSION, ")" , STATEMENT, { ("else" , STATEMENT) | λ };
+FUNCTION_CALL = IDENTIFIER , "(" [ , IDENTIFIER [ , { "," , IDENTIFIER } ] ] , ")" ;
 
-WHILE = "while" , "(" , REL_EXPRESSION , ")" , STATEMENT;
+STATEMENT = ( λ | IDENTIFIER_DECLARATION | FUNCTION_DECLARATION | FUNCTION_CALL | ASSIGNMENT | BLOCK | WHILE_STATEMENT | IF_STATEMENT ), ";";
 
-SCANF = "scanf" , "(" , ")";
+FACTOR = ( NUMBER | STRING | IDENTIFIER | FUNCTION_CALL | ( UNNARY_OPERATOR , FACTOR ) | "(" , CONDITIONAL , ")" );
 
-INT = DIGIT , { DIGIT };
+TERM = FACTOR, { ("*" | "/" | "&&"), FACTOR } ;
 
-IDENTIFIER = LETTER , { LETTER | DIGIT | "_" };
+EXPRESSION = TERM, { ("+" | "-" | "||"), TERM } ;
 
-DIGIT = ( 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 );
+CONDITIONAL = EXPRESSION , { ("<" | "==" | ">" ) , EXPRESSION } ;
 
-LETTER = (a | b | c | d | ... x | y | z | A | B | ... | Y | Z );
+WHILE_STATEMENT = "while" , "(" , CONDITIONAL , ")" , BLOCK ;
+
+IF_STATEMENT = "if" , "(" , CONDITIONAL , ")" , BLOCK , [ "else" , BLOCK ] ;
+
+ASSIGNMENT = IDENTIFIER, "=" , EXPRESSION ;
+
+IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
+
+UNNARY_OPERATOR = ( "+" | "-" | "!" ) ;
+
+NUMBER = DIGIT [ { , DIGIT } ] ;
+
+STRING = '"' , { ... } , '"' ;
+
+LETTER = ( "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" |
+"K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" |
+"W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" |
+"i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" |
+"u" | "v" | "w" | "x" | "y" | "z" ) ;
+
+DIGIT = ( "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0" ) ;
 ```
 
 ## Figma
